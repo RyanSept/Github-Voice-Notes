@@ -7,11 +7,6 @@
         "removeComments": true,
         "jsx": "react",
         "allowJs": true,
-        "baseUrl": "./src",
-        "paths": {
-            "components/*": [
-                "src/components/*"
-            ],
-        }
+        "baseUrl": "./src"
     }
 }
