@@ -1,0 +1,22 @@
+{
+  "name": "Github Voice Notes",
+  "description": "Add audio clips as comments to pull requests on Github",
+  "version": "0.1",
+  "manifest_version": 2,
+  "browser_action": {
+    "default_popup": "index.html"
+  },
+  "icons": {
+    "48": "static/icon.jpg"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.example.com/*"
+      ],
+      "js": [
+        "main.js"
+      ]
+    }
+  ]
+}
