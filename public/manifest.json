@@ -12,7 +12,7 @@
   "content_scripts": [
     {
       "matches": [
-        "*://*.example.com/*"
+        "*://github.com/*/pull/*"
       ],
       "js": [
         "main.js"
