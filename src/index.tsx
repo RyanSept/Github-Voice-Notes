@@ -13,7 +13,7 @@ function getIssueCommentDivs(): NodeList {
 getIssueCommentDivs().forEach((commentDiv: Element) => {
     const voiceNoteContainerID = `${commentDiv.id}-voice-note-container`
     const voiceNoteContainer = `
-            <voiceNoteContainer class="d-block">
+            <tr class="d-block">
                 <td class="d-block comment-body js-comment-body gvn-container" id="${voiceNoteContainerID}">
                 </td>
             </tr>

@@ -15,6 +15,7 @@
     "source-map-loader": "^0.2.4",
     "ts-loader": "^7.0.2",
     "typescript": "^3.8.3",
+    "web-ext-types": "github:kelseasy/web-ext-types",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.10.3"
