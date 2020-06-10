@@ -9,6 +9,7 @@
   "icons": {
     "48": "static/icon.jpg"
   },
+  "content_security_policy": "script-src 'self'; object-src 'self'; media-src *;",
   "content_scripts": [
     {
       "matches": [
@@ -18,5 +19,14 @@
         "main.js"
       ]
     }
-  ]
+  ],
+  "permissions": [
+    "webRequest",
+    "<all_urls>"
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  }
 }
