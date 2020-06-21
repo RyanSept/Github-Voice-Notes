@@ -9,7 +9,7 @@
   "icons": {
     "48": "static/icon.jpg"
   },
-  "content_security_policy": "script-src 'self'; object-src 'self'; media-src *;",
+  "content_security_policy": "script-src 'self'; object-src 'self'; media-src https://media.w3.org;",
   "content_scripts": [
     {
       "matches": [
@@ -23,7 +23,7 @@
   "permissions": [
     "webRequest",
     "webRequestBlocking",
-    "<all_urls>"
+    "*://github.com/*/*/pull/*"
   ],
   "background": {
     "scripts": [
