@@ -7,7 +7,7 @@ module.exports = {
         main: "./src/index.tsx",
         background: "./src/background.ts",
     },
-    devtool: "source-map",
+    devtool: "inline-source-map",
     mode: "production",
     module: {
         rules: [
@@ -15,6 +15,31 @@ module.exports = {
                 test: /\.tsx?$/,
                 use: "ts-loader",
                 exclude: /node_modules/,
+            },
+            {
+                test: /\.css$/i,
+                use: [
+                    {
+                        loader: "style-loader",
+                        options: {
+                            esModule: true,
+                            modules: {
+                                namedExport: true,
+                            },
+                        },
+                    },
+                    {
+                        loader: "css-loader",
+                        options: {
+                            importLoaders: 1,
+                            esModule: true,
+                            modules: {
+                                namedExport: true,
+                            },
+                            url: true,
+                        },
+                    },
+                ],
             },
         ],
     },
@@ -32,7 +57,8 @@ module.exports = {
         }),
         new CopyPlugin([
             { from: "./public/manifest.json" },
-            { from: "./public/icon.jpg", to: "static/icon.jpg" },
+            { from: "./public/*.jpg", to: "static", flatten: true },
+            { from: "./public/*.png", to: "static", flatten: true },
         ]),
     ],
 }

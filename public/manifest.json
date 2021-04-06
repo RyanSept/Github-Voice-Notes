@@ -9,11 +9,13 @@
   "icons": {
     "48": "static/gvn-icon-128.png"
   },
-  "content_security_policy": "script-src 'self'; object-src 'self'; media-src https://media.w3.org;",
+  "content_security_policy": "script-src 'self'; object-src 'self';",
   "content_scripts": [
     {
       "matches": [
-        "*://github.com/*/*/pull/*"
+        "*://github.com/*/*/pull/*",
+        "*://github.com/*/*/pull/*/files",
+        "*://github.com/*/*/pull/*/commits/*"
       ],
       "js": [
         "main.js"
@@ -22,8 +24,10 @@
   ],
   "permissions": [
     "webRequest",
-    "webRequestBlocking",
-    "*://github.com/*/*/pull/*"
+    "tabs"
+  ],
+  "web_accessible_resources": [
+    "static/*"
   ],
   "background": {
     "scripts": [

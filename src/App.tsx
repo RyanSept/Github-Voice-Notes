@@ -1,22 +1,23 @@
 import * as React from "react"
 
+const css = require("./index.css")
+
 class App extends React.Component {
     render() {
+        const gvnIcon = chrome.runtime.getURL("static/gvn-icon-128.png")
+        console.log(css.voiceRecordButton)
         console.log("ashisogi")
-        debugger
         return (
-            <div>
-                <audio controls>
-                    <source
-                        src="https://media.w3.org/2010/07/bunny/04-Death_Becomes_Fur.oga"
-                        type="audio/ogg; codecs=vorbis"
-                    />
-                    <p>
-                        Your user agent does not support the HTML5 Audio
-                        element.
-                    </p>
-                </audio>
-            </div>
+            <>
+                <div
+                    className={css.voiceRecordButton}
+                    style={{
+                        backgroundImage: `url(${gvnIcon})`,
+                    }}
+                >
+                    {/* <img src={gvnIcon} className={css.voiceRecordButtonIcon}/> */}
+                </div>
+            </>
         )
     }
 }
