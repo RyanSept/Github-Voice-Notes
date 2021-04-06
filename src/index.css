@@ -1,0 +1,17 @@
+.voice-record-button {
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    right: 0;
+    z-index: 1;
+    text-align: center;
+    background: white;
+    background-position: center -20%;
+    background-repeat: no-repeat;
+    background-size: 70%;
+    background-color: white;
+    border-radius: 40px;
+    border: 1px solid lightgrey;
+    box-shadow: 4px 7px 10px -6px;
+    top: 22%;
+}
