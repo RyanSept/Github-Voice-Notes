@@ -1,8 +1,6 @@
-import * as globToRegExp from "glob-to-regexp"
-
-const MANIFEST_URL_WHITELIST: RegExp[] = chrome.runtime
-    .getManifest()
-    .content_scripts[0].matches.map((glob: string) => globToRegExp(glob))
+// const MANIFEST_URL_WHITELIST: RegExp[] = chrome.runtime
+//     .getManifest()
+//     .content_scripts[0].matches.map((glob: string) => globToRegExp(glob))
 
 // Source: https://github.com/iamovrhere/GoogleMapsEverywhereCsp/blob/master/src/background.js
 const GVN_API = "media.w3.org"
@@ -58,20 +56,3 @@ function modifyCSP(e) {
 //     },
 //     ["blocking", "responseHeaders"]
 // )
-
-// Add listener to check whether tab matches manifest url whitelist
-// chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-//     // read changeInfo data and do something with it
-//     // like send the new url to contentscripts.js
-//     if (
-//         MANIFEST_URL_WHITELIST.some((pattern: RegExp) =>
-//             pattern.test(changeInfo.url)
-//         )
-//     ) {
-//         console.log("WHY GOD WHY", changeInfo.url)
-//         chrome.tabs.sendMessage(tabId, {
-//             message: "hello!",
-//             url: changeInfo.url,
-//         })
-//     }
-// })

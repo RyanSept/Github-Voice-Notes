@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@types/chrome": "0.0.127",
-    "glob-to-regexp": "^0.4.1",
+    "javascript-state-machine": "^3.1.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
   },
