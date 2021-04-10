@@ -1,10 +1,15 @@
-.voice-record-button {
+.voice-record-controls-container {
+    position: absolute;
+    left: 98.5%;
+    z-index: 1;
+    top: 22%;
+    display: flex;
+    flex-direction: row;
+}
+
+.voice-record-start-button {
     width: 40px;
     height: 40px;
-    position: absolute;
-    right: 0;
-    z-index: 1;
-    text-align: center;
     background: white;
     background-position: center -20%;
     background-repeat: no-repeat;
@@ -13,5 +18,23 @@
     border-radius: 40px;
     border: 1px solid lightgrey;
     box-shadow: 4px 7px 10px -6px;
-    top: 22%;
+}
+
+.voice-record-controls {
+    padding-top: 10px;
+}
+
+.voice-record-controls::before {
+    border: 1px solid lightgray;
+    border-left: none;
+    content: "";
+    position: absolute;
+    width: 91%;
+    height: 84%;
+    top: 10%;
+    left: 20%;
+    z-index: -1;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    box-shadow: 4px 7px 10px -6px;
 }
