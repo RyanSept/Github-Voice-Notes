@@ -62,6 +62,7 @@ let fil = new File(['file:///Users/ryanmarvin/Downloads/weather-api-dev-15830962
 dataTransfer.items.add(fil)
 fileAttachment.attach(dataTransfer)
 */
+
 setup()
 
 const observer = new MutationObserver(function (mutations: MutationRecord[]) {

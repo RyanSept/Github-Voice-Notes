@@ -1,12 +1,17 @@
 import * as React from "react"
 import * as StateMachine from "javascript-state-machine"
+import GVNMediaRecorderSingelton from "./audio-recorder"
 
 const css = require("./index.css")
 
 interface AppProps {}
 interface AppState {
     recordingFSMState: string
+    isRecording: Boolean
 }
+
+// in milliseconds
+const MAX_RECORDING_LENGTH = 10 * 1000
 
 class App extends React.Component<AppProps, AppState> {
     recordingFSM: StateMachine
@@ -24,23 +29,49 @@ class App extends React.Component<AppProps, AppState> {
             ],
             methods: {
                 onStart: () => {
-                    console.log("Starting recording ...")
+                    GVNMediaRecorderSingelton.start(
+                        this.onStartRecording,
+                        this.onStopRecording
+                    )
                 },
                 onAccept: () => {
+                    GVNMediaRecorderSingelton.stop()
                     console.log("Ended recording due to user ...")
                 },
                 onTimeEnd: () => {
+                    GVNMediaRecorderSingelton.stop()
                     console.log("Ended recording due to time end ...")
                 },
                 onCancel: () => {
                     console.log("Canceled recording ...")
                 },
                 onEnterState: (lifecycle) => {
+                    console.log(
+                        "Changing state from",
+                        lifecycle.from,
+                        "to",
+                        lifecycle.to
+                    )
                     this.setState({ recordingFSMState: lifecycle.to })
                 },
             },
         })
-        this.state = { recordingFSMState: this.recordingFSM.state }
+        this.state = {
+            recordingFSMState: this.recordingFSM.state,
+            get isRecording() {
+                return GVNMediaRecorderSingelton.isRecording
+            },
+        }
+    }
+
+    onStartRecording = () => {
+        console.log("Start from App.tsx")
+        setTimeout(() => this.recordingFSM.timeEnd(), MAX_RECORDING_LENGTH)
+    }
+
+    onStopRecording = (data: File) => {
+        console.log("Stop from App.tsx")
+        console.log(data)
     }
 
     render() {
@@ -52,7 +83,6 @@ class App extends React.Component<AppProps, AppState> {
                     className={css.voiceRecordStartButton}
                     onClick={() => {
                         this.recordingFSM.start()
-                        console.log(this.recordingFSM.state)
                     }}
                     style={{
                         backgroundImage: `url(${gvnIcon})`,
