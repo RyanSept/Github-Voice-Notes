@@ -1,10 +1,14 @@
-import * as React from "react"
+import FileAttachmentElement from "@github/file-attachment-element"
 import * as StateMachine from "javascript-state-machine"
+import * as React from "react"
+
 import GVNMediaRecorderSingelton from "./audio-recorder"
 
 const css = require("./index.css")
 
-interface AppProps {}
+interface AppProps {
+    id: string
+}
 interface AppState {
     recordingFSMState: string
     isRecording: Boolean
@@ -72,6 +76,20 @@ class App extends React.Component<AppProps, AppState> {
     onStopRecording = (data: File) => {
         console.log("Stop from App.tsx")
         console.log(data)
+        let dataTransfer = new DataTransfer()
+        dataTransfer.items.add(data)
+
+        const selfDOMElement = document.getElementById(this.props.id)
+        // @ts-ignore
+        const fileAttachmentEl: FileAttachmentElement = selfDOMElement.parentElement.getElementsByTagName(
+            "file-attachment"
+        )[0]
+        console.log(
+            "File Attachemnte",
+            fileAttachmentEl,
+            fileAttachmentEl.attach
+        )
+        fileAttachmentEl.attach(dataTransfer)
     }
 
     render() {
