@@ -6,6 +6,7 @@ module.exports = {
     entry: {
         main: "./src/index.tsx",
         background: "./src/background.ts",
+        "page-script": "./src/page-script.ts",
     },
     devtool: "inline-source-map",
     mode: "production",

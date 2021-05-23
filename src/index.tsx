@@ -1,5 +1,7 @@
+import FileAttachmentElement from "@github/file-attachment-element"
 import * as React from "react"
 import * as ReactDOM from "react-dom"
+import { v4 as uuidv4 } from "uuid"
 
 import App from "./App"
 
@@ -32,8 +34,10 @@ function insertNewVoiceNoteButton() {
     newCommentFormActions.insertAdjacentHTML("afterbegin", newVoiceNoteButton)
 }
 
-function embedGVNOnFileAttachments(commentFileAttachment: Element) {
-    const voiceRecordControlsContainerID = `voice-record-controls-container-${commentFileAttachment.attributes["input"].value}`
+function embedGVNOnFileAttachments(
+    commentFileAttachment: FileAttachmentElement
+) {
+    const voiceRecordControlsContainerID = `voice-record-controls-container-${uuidv4()}`
     const voiceRecordButtonContainer = `
             <div id="${voiceRecordControlsContainerID}" class="${css.voiceRecordControlsContainer} pt-1">
             </div>
@@ -43,7 +47,7 @@ function embedGVNOnFileAttachments(commentFileAttachment: Element) {
         voiceRecordButtonContainer
     )
     ReactDOM.render(
-        <App />,
+        <App id={voiceRecordControlsContainerID} />,
         document.getElementById(voiceRecordControlsContainerID)
     )
 }
@@ -77,4 +81,11 @@ const observer = new MutationObserver(function (mutations: MutationRecord[]) {
     })
 })
 observer.observe(document, { childList: true, subtree: true })
-console.log("Registered shit")
+
+// Inject script into page
+const pageScript = document.createElement("script")
+pageScript.src = chrome.runtime.getURL("page-script.js")
+document.head.appendChild(pageScript)
+pageScript.onload = function () {
+    pageScript.remove()
+}
