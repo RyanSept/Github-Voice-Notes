@@ -3,6 +3,11 @@ import * as StateMachine from "javascript-state-machine"
 import * as React from "react"
 
 import GVNMediaRecorderSingelton from "./audio-recorder"
+import {
+    AttachFileMessageEvent,
+    ATTACH_FILE_MESSAGE_EVENT_TYPE,
+    FILE_ATTACHED_MESSAGE_EVENT_TYPE,
+} from "./constants"
 
 const css = require("./index.css")
 
@@ -34,8 +39,8 @@ class App extends React.Component<AppProps, AppState> {
             methods: {
                 onStart: () => {
                     GVNMediaRecorderSingelton.start(
-                        this.onStartRecording,
-                        this.onStopRecording
+                        this.handleMediaRecorderStart,
+                        this.handleMediaRecorderStop
                     )
                 },
                 onAccept: () => {
@@ -46,8 +51,11 @@ class App extends React.Component<AppProps, AppState> {
                     GVNMediaRecorderSingelton.stop()
                     console.log("Ended recording due to time end ...")
                 },
-                onCancel: () => {
+                onCancel: function () {
                     console.log("Canceled recording ...")
+                    GVNMediaRecorderSingelton.stop(false)
+                    // because we can't transition within transition
+                    setTimeout(() => this.reset(), 1)
                 },
                 onEnterState: (lifecycle) => {
                     console.log(
@@ -68,33 +76,45 @@ class App extends React.Component<AppProps, AppState> {
         }
     }
 
-    onStartRecording = () => {
-        console.log("Start from App.tsx")
-        setTimeout(() => this.recordingFSM.timeEnd(), MAX_RECORDING_LENGTH)
+    handleMediaRecorderStart = () => {
+        setTimeout(() => {
+            if (!["ended", "off"].includes(this.state.recordingFSMState)) {
+                this.recordingFSM.timeEnd()
+            }
+        }, MAX_RECORDING_LENGTH)
+        window.addEventListener(
+            "message",
+            (event: MessageEvent) => {
+                // We only accept messages from ourselves
+                if (event.source != window) {
+                    return
+                }
+                if (
+                    event.data.type === FILE_ATTACHED_MESSAGE_EVENT_TYPE &&
+                    this.props.id === event.data.elementID
+                ) {
+                    this.recordingFSM.reset()
+                }
+            },
+            false
+        )
     }
 
-    onStopRecording = (data: File) => {
-        console.log("Stop from App.tsx")
-        console.log(data)
-        let dataTransfer = new DataTransfer()
-        dataTransfer.items.add(data)
-
-        const selfDOMElement = document.getElementById(this.props.id)
-        // @ts-ignore
-        const fileAttachmentEl: FileAttachmentElement = selfDOMElement.parentElement.getElementsByTagName(
-            "file-attachment"
-        )[0]
-        console.log(
-            "File Attachemnte",
-            fileAttachmentEl,
-            fileAttachmentEl.attach
-        )
-        fileAttachmentEl.attach(dataTransfer)
+    handleMediaRecorderStop = (data: File) => {
+        /* Because content-script doesn't have access to file-attachment
+         * expando properties to do this directly we send data to page script for attachment.
+         */
+        const messageEvent: AttachFileMessageEvent = {
+            type: ATTACH_FILE_MESSAGE_EVENT_TYPE,
+            file: data,
+            elementID: this.props.id,
+            extensionID: chrome.runtime.id,
+        }
+        window.postMessage(messageEvent, "https://github.com")
     }
 
     render() {
         const gvnIcon = chrome.runtime.getURL("static/gvn-icon-128.png")
-        console.log("Embeded GVN")
         return (
             <>
                 <div

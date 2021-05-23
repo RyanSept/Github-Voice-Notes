@@ -79,7 +79,7 @@ const GVNMediaRecorderSingelton = {
         this.mediaRecorder.onstop = () => {
             // blob of type mp3
             let audioFile = new File(dataArray, "recording.mp4", {
-                type: "audio/mp3;",
+                type: "video/mp4",
             })
             const audioURL = window.URL.createObjectURL(audioFile)
             console.log("RECORDING URL", audioURL)
@@ -88,10 +88,18 @@ const GVNMediaRecorderSingelton = {
         }
     },
 
-    /** Start recording */
-    stop() {
+    /** Start recording
+     * @param triggerOnStopCallback whether to trigger onstop callback
+     */
+    stop(triggerOnStopCallback: Boolean = true) {
         if (this.isRecording) {
+            if (!triggerOnStopCallback) {
+                this.mediaRecorder.onstop = undefined
+            }
             this.mediaRecorder.stop()
+            this.mediaRecorder.stream
+                .getTracks()
+                .forEach((track) => track.stop())
             this.mediaRecorder = null
         }
     },

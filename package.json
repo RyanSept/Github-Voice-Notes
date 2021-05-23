@@ -3,10 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@github/file-attachment-element": "^1.0.3",
     "@types/chrome": "0.0.127",
     "javascript-state-machine": "^3.1.0",
     "react": "^16.13.1",
-    "react-dom": "^16.13.1"
+    "react-dom": "^16.13.1",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/dom-mediacapture-record": "^1.0.7",

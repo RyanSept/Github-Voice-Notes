@@ -22,12 +22,18 @@
       ]
     }
   ],
+  "externally_connectable": {
+    "matches": [
+      "*://github.com/*"
+    ]
+  },
   "permissions": [
     "webRequest",
     "tabs"
   ],
   "web_accessible_resources": [
-    "static/*"
+    "static/*",
+    "page-script.js"
   ],
   "background": {
     "scripts": [
