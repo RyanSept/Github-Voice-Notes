@@ -1,7 +1,6 @@
 import {
     ATTACH_FILE_MESSAGE_EVENT_TYPE,
     FILE_ATTACHED_MESSAGE_EVENT_TYPE,
-    AttachFileMessageEvent,
     FileAttachedMessageEvent,
 } from "./constants"
 
@@ -23,7 +22,6 @@ function handleAttachFileEvent(event: MessageEvent) {
     }
 
     fileAttachmentEl.attach(dataTransfer).then(() => {
-        console.log("FILE_ATTACHED event")
         window.postMessage(attachedEvent, "https://github.com")
     })
 }

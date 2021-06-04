@@ -59,14 +59,6 @@ function setup() {
     // insertNewVoiceNoteButton()
 }
 
-/*
-fileAttachment = document.querySelectorAll("file-attachment.js-upload-markdown-image")[10]
-dataTransfer = new DataTransfer()
-let fil = new File(['file:///Users/ryanmarvin/Downloads/weather-api-dev-1583096221/pylint/test/functional/access_to_protected_members.txt'], 'testFile.txt', {type: 'text/plain'})
-dataTransfer.items.add(fil)
-fileAttachment.attach(dataTransfer)
-*/
-
 setup()
 
 const observer = new MutationObserver(function (mutations: MutationRecord[]) {

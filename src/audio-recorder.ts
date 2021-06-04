@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid"
 class UninitializedError extends Error {
     constructor(message) {
         super(message)
@@ -25,10 +26,10 @@ const GVNMediaRecorderSingelton = {
      */
     start(
         onStartCallback: EventListener,
-        onStopCallback: (data: File) => void
+        onStopCallback: (data: File) => void,
+        onStartErrorCallback: Function
     ) {
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            console.log("getUserMedia supported.")
             navigator.mediaDevices
                 .getUserMedia({
                     audio: true,
@@ -40,13 +41,14 @@ const GVNMediaRecorderSingelton = {
                     }
                     this.mediaRecorder.start()
                 })
-                .catch(function (err) {
-                    console.log(
+                .catch((err) => {
+                    console.error(
                         "The following getUserMedia error occurred: " + err
                     )
+                    onStartErrorCallback()
                 })
         } else {
-            console.log("getUserMedia not supported on your browser!")
+            console.error("getUserMedia not supported on your browser!")
         }
     },
     get isRecording(): Boolean {
@@ -77,12 +79,13 @@ const GVNMediaRecorderSingelton = {
         }
 
         this.mediaRecorder.onstop = () => {
-            // blob of type mp3
-            let audioFile = new File(dataArray, "recording.mp4", {
-                type: "video/mp4",
-            })
-            const audioURL = window.URL.createObjectURL(audioFile)
-            console.log("RECORDING URL", audioURL)
+            let audioFile = new File(
+                dataArray,
+                `GithubVoiceNotes-${uuidv4().slice(0, 8)}.mp4`,
+                {
+                    type: "video/mp4",
+                }
+            )
             onStopCallback(audioFile)
             dataArray = []
         }
