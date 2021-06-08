@@ -4,13 +4,14 @@
   "private": true,
   "dependencies": {
     "@github/file-attachment-element": "^1.0.3",
-    "@types/chrome": "0.0.127",
     "javascript-state-machine": "^3.1.0",
     "react": "^16.13.1",
+    "react-countdown": "^2.3.2",
     "react-dom": "^16.13.1",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@types/chrome": "0.0.144",
     "@types/dom-mediacapture-record": "^1.0.7",
     "@types/react": "^16.9.34",
     "@types/react-dom": "^16.9.7",
@@ -24,11 +25,12 @@
     "typescript": "^3.8.3",
     "url-loader": "^4.1.1",
     "webpack": "^4.43.0",
+    "webpack-bundle-analyzer": "^4.4.2",
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.10.3"
   },
   "scripts": {
-    "start": "webpack --watch --progress --hot",
-    "build": "webpack --mode production"
+    "start": "webpack --watch --progress",
+    "build": "webpack -p --mode production"
   }
 }
