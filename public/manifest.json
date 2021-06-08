@@ -4,7 +4,9 @@
   "version": "0.1",
   "manifest_version": 2,
   "icons": {
-    "48": "static/gvn-icon-128.png"
+    "16": "static/gvn-icon-16.png",
+    "48": "static/gvn-icon-48.png",
+    "128": "static/gvn-icon-square-128.png"
   },
   "content_security_policy": "script-src 'self'; object-src 'self';",
   "content_scripts": [
