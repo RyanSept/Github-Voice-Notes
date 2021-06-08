@@ -24,10 +24,6 @@
       "*://github.com/*"
     ]
   },
-  "permissions": [
-    "webRequest",
-    "tabs"
-  ],
   "web_accessible_resources": [
     "static/*",
     "page-script.js"
