@@ -1,11 +1,12 @@
 const path = require("path")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 const CopyPlugin = require("copy-webpack-plugin")
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
+    .BundleAnalyzerPlugin
 
 module.exports = {
     entry: {
         main: "./src/index.tsx",
-        background: "./src/background.ts",
         "page-script": "./src/page-script.ts",
     },
     devtool: "inline-source-map",
@@ -49,13 +50,8 @@ module.exports = {
     },
     output: {
         path: path.resolve(__dirname, "build"),
-        hotUpdateChunkFilename: "hot/hot-update.js",
-        hotUpdateMainFilename: "hot/hot-update.json",
     },
     plugins: [
-        new HtmlWebpackPlugin({
-            template: "./public/index.html",
-        }),
         new CopyPlugin([
             { from: "./public/manifest.json" },
             { from: "./public/*.jpg", to: "static", flatten: true },
