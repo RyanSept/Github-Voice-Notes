@@ -5,6 +5,7 @@
   "dependencies": {
     "@github/file-attachment-element": "^1.0.3",
     "javascript-state-machine": "^3.1.0",
+    "mixpanel-browser": "^2.41.0",
     "react": "^16.13.1",
     "react-countdown": "^2.3.2",
     "react-dom": "^16.13.1",
@@ -13,10 +14,12 @@
   "devDependencies": {
     "@types/chrome": "0.0.144",
     "@types/dom-mediacapture-record": "^1.0.7",
+    "@types/mixpanel-browser": "^2.35.6",
     "@types/react": "^16.9.34",
     "@types/react-dom": "^16.9.7",
     "copy-webpack-plugin": "^5.1.1",
     "css-loader": "^5.0.1",
+    "dotenv-webpack": "^7.0.3",
     "file-loader": "^6.0.0",
     "html-webpack-plugin": "^4.3.0",
     "source-map-loader": "^0.2.4",
@@ -27,7 +30,7 @@
     "webpack": "^4.43.0",
     "webpack-bundle-analyzer": "^4.4.2",
     "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.10.3"
+    "webpack-dev-server": "^3.11.2"
   },
   "scripts": {
     "start": "webpack --watch --progress",

@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid"
+
 class UninitializedError extends Error {
     constructor(message) {
         super(message)
@@ -27,7 +28,8 @@ const GVNMediaRecorderSingelton = {
     start(
         onStartCallback: EventListener,
         onStopCallback: (data: File) => void,
-        onStartErrorCallback: Function
+        onStartErrorCallback: (err: Error) => void,
+        onUnsupportedCallback: Function
     ) {
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             navigator.mediaDevices
@@ -45,10 +47,11 @@ const GVNMediaRecorderSingelton = {
                     console.error(
                         "The following getUserMedia error occurred: " + err
                     )
-                    onStartErrorCallback()
+                    onStartErrorCallback(err)
                 })
         } else {
             console.error("getUserMedia not supported on your browser!")
+            onUnsupportedCallback()
         }
     },
     get isRecording(): Boolean {

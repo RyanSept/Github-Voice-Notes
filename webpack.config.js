@@ -1,8 +1,6 @@
-const path = require("path")
-const HtmlWebpackPlugin = require("html-webpack-plugin")
 const CopyPlugin = require("copy-webpack-plugin")
-const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
-    .BundleAnalyzerPlugin
+const path = require("path")
+const Dotenv = require("dotenv-webpack")
 
 module.exports = {
     entry: {
@@ -57,5 +55,6 @@ module.exports = {
             { from: "./public/*.jpg", to: "static", flatten: true },
             { from: "./public/*.png", to: "static", flatten: true },
         ]),
+        new Dotenv({ path: __dirname + "/.env" }),
     ],
 }
