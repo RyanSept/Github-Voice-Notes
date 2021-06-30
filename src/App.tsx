@@ -1,3 +1,10 @@
+import {
+    trackNoBrowserSupport,
+    trackRecordingCanceled,
+    trackRecordingStarted,
+    trackRecordingStartError,
+    trackRecordingEnded,
+} from "./analytics"
 import * as StateMachine from "javascript-state-machine"
 import * as React from "react"
 import Countdown, { CountdownTimeDelta } from "react-countdown"
@@ -30,6 +37,9 @@ interface IAppState {
 
 // in milliseconds
 const MAX_RECORDING_LENGTH = 120 * 1000
+function calculateRecordingLength(leftOverTime: number): number {
+    return MAX_RECORDING_LENGTH - leftOverTime
+}
 
 class App extends React.Component<IAppProps, IAppState> {
     recordingFSM: StateMachine
@@ -49,32 +59,50 @@ class App extends React.Component<IAppProps, IAppState> {
                 { name: "cancel", from: "recording", to: "canceled" },
                 { name: "reset", from: "*", to: "off" },
             ],
+            data: {
+                // recording start and end, file duration
+            },
             methods: {
                 onStart: function () {
                     GVNMediaRecorderSingelton.start(
                         thatScope.handleMediaRecorderStart,
                         thatScope.handleMediaRecorderStop,
-                        () => {
+                        (err) => {
                             thatScope.setState({ isAudioInputAllowed: false })
-                        }
+                            trackRecordingStartError({ error: err.name })
+                        },
+                        trackNoBrowserSupport
                     )
                 },
-                onAccept: function () {
+                onLeaveRecording: function (lifecycle) {
                     clearTimeout(thatScope.timeEndedTimeout)
-                },
-                onEnded: function () {
-                    GVNMediaRecorderSingelton.stop()
+                    if (lifecycle.to === "ended") {
+                        trackRecordingEnded({
+                            recordingDurationMs: calculateRecordingLength(
+                                thatScope.countdownComponentRef.current.calcTimeDelta()
+                                    .total
+                            ),
+                        })
+                        GVNMediaRecorderSingelton.stop()
+                    }
+                    if (lifecycle.to === "canceled") {
+                        trackRecordingCanceled({
+                            recordingDurationMs: calculateRecordingLength(
+                                thatScope.countdownComponentRef.current.calcTimeDelta()
+                                    .total
+                            ),
+                        })
+                        thatScope.countdownComponentRef.current.getApi().stop()
+                        GVNMediaRecorderSingelton.stop(false)
+                        // because we can't transition within transition
+                        setImmediate(() => this.reset())
+                    }
                     thatScope.setState({ isGlobalRecording: false })
-                },
-                onCancel: function () {
-                    GVNMediaRecorderSingelton.stop(false)
-                    clearTimeout(thatScope.timeEndedTimeout)
-                    thatScope.setState({ isGlobalRecording: false })
-                    // because we can't transition within transition
-                    setImmediate(() => this.reset())
                 },
                 onEnterState: function (lifecycle) {
-                    thatScope.setState({ recordingFSMState: lifecycle.to })
+                    if (lifecycle.transition !== "init") {
+                        thatScope.setState({ recordingFSMState: lifecycle.to })
+                    }
                 },
             },
         })
@@ -103,11 +131,11 @@ class App extends React.Component<IAppProps, IAppState> {
 
         this.countdownComponentRef.current.getApi().start()
 
-        // Add listener for file attached to dom element from page script
+        // Add listener for file attached to dom element event emitted from page script
         window.addEventListener(
             "message",
             (event: MessageEvent) => {
-                // We only accept messages from ourselves
+                // We only accept messages from ourselves!
                 if (event.source != window) {
                     return
                 }
@@ -120,6 +148,8 @@ class App extends React.Component<IAppProps, IAppState> {
             },
             false
         )
+
+        trackRecordingStarted()
     }
 
     handleMediaRecorderStop = (data: File) => {
@@ -139,8 +169,10 @@ class App extends React.Component<IAppProps, IAppState> {
         const gvnIcon = chrome.runtime.getURL("static/gvn-icon-128.png")
         return (
             <>
-                <div
+                <button
                     className={css.voiceRecordStartButton}
+                    aria-label="Start recording"
+                    type="button"
                     onClick={() => {
                         if (!this.state.isGlobalRecording) {
                             this.recordingFSM.start()
@@ -149,7 +181,7 @@ class App extends React.Component<IAppProps, IAppState> {
                     style={{
                         backgroundImage: `url(${gvnIcon})`,
                     }}
-                ></div>
+                ></button>
                 {this.state.recordingFSMState === "recording" && (
                     <VoiceRecordControls
                         handleAccept={() => {
@@ -170,48 +202,56 @@ class App extends React.Component<IAppProps, IAppState> {
 
 function VoiceRecordControls(props: IVoiceRecordControls) {
     return (
-        <div className={`${css.voiceRecordControls} d-flex pl-1`}>
+        <div className={`${css.voiceRecordControls} d-flex mt-1`}>
             {props.isAudioInputAllowed ? (
                 <>
-                    {/* octicon check-circle-fill */}
-                    <svg
-                        className="octicon color-icon-success mr-1"
+                    <button
+                        aria-label="Accept recording"
+                        type="button"
                         onClick={() => {
-                            props.countDownComponentRef.current.getApi().stop()
                             props.handleAccept()
                         }}
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 16 16"
-                        width="20"
-                        height="20"
                     >
-                        <path
-                            fill-rule="evenodd"
-                            d="M8 16A8 8 0 108 0a8 8 0 000 16zm3.78-9.72a.75.75 0 00-1.06-1.06L6.75 9.19 5.28 7.72a.75.75 0 00-1.06 1.06l2 2a.75.75 0 001.06 0l4.5-4.5z"
-                        ></path>
-                    </svg>
+                        {/* octicon check-circle-fill */}
+                        <svg
+                            className="octicon color-icon-success"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 16 16"
+                            width="20"
+                            height="20"
+                        >
+                            <path
+                                fillRule="evenodd"
+                                d="M8 16A8 8 0 108 0a8 8 0 000 16zm3.78-9.72a.75.75 0 00-1.06-1.06L6.75 9.19 5.28 7.72a.75.75 0 00-1.06 1.06l2 2a.75.75 0 001.06 0l4.5-4.5z"
+                            ></path>
+                        </svg>
+                    </button>
                     <Countdown
                         date={props.recordingEndTime}
-                        // autoStart={false}
                         renderer={countDownRenderer}
                         ref={props.countDownComponentRef}
                     />
                     {/* octicon check-circle-fill */}
-                    <svg
-                        className="octicon color-icon-danger ml-1"
+                    <button
+                        aria-label="Cancel recording"
+                        type="button"
                         onClick={() => {
                             props.handleCancel()
                         }}
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 16 16"
-                        width="20"
-                        height="20"
                     >
-                        <path
-                            fill-rule="evenodd"
-                            d="M2.343 13.657A8 8 0 1113.657 2.343 8 8 0 012.343 13.657zM6.03 4.97a.75.75 0 00-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 101.06 1.06L8 9.06l1.97 1.97a.75.75 0 101.06-1.06L9.06 8l1.97-1.97a.75.75 0 10-1.06-1.06L8 6.94 6.03 4.97z"
-                        ></path>
-                    </svg>
+                        <svg
+                            className="octicon color-icon-danger"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 16 16"
+                            width="20"
+                            height="20"
+                        >
+                            <path
+                                fillRule="evenodd"
+                                d="M2.343 13.657A8 8 0 1113.657 2.343 8 8 0 012.343 13.657zM6.03 4.97a.75.75 0 00-1.06 1.06L6.94 8 4.97 9.97a.75.75 0 101.06 1.06L8 9.06l1.97 1.97a.75.75 0 101.06-1.06L9.06 8l1.97-1.97a.75.75 0 10-1.06-1.06L8 6.94 6.03 4.97z"
+                            ></path>
+                        </svg>
+                    </button>
                 </>
             ) : (
                 <NotAllowedErrorMessage />
@@ -234,7 +274,7 @@ const NotAllowedErrorMessage = () => {
                 height="16"
             >
                 <path
-                    fill-rule="evenodd"
+                    fillRule="evenodd"
                     d="M8.22 1.754a.25.25 0 00-.44 0L1.698 13.132a.25.25 0 00.22.368h12.164a.25.25 0 00.22-.368L8.22 1.754zm-1.763-.707c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0114.082 15H1.918a1.75 1.75 0 01-1.543-2.575L6.457 1.047zM9 11a1 1 0 11-2 0 1 1 0 012 0zm-.25-5.25a.75.75 0 00-1.5 0v2.5a.75.75 0 001.5 0v-2.5z"
                 ></path>
             </svg>

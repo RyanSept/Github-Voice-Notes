@@ -10,6 +10,7 @@
 .voice-record-start-button {
     width: 40px;
     height: 40px;
+    padding: 0px;
     background: white;
     background-position: center -20%;
     background-repeat: no-repeat;
@@ -20,8 +21,10 @@
     box-shadow: 4px 7px 10px -6px;
 }
 
-.voice-record-controls {
-    padding-top: 10px;
+.voice-record-controls span {
+    margin-top: 6%;
+    width: 40px;
+    text-align: center;
 }
 
 .voice-record-controls::before {
@@ -29,12 +32,18 @@
     border-left: none;
     content: "";
     position: absolute;
-    width: 91%;
+    width: 88%;
     height: 84%;
-    top: 10%;
-    left: 20%;
+    top: 12%;
+    left: 14%;
     z-index: -1;
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
     box-shadow: 4px 7px 10px -6px;
+}
+
+.voice-record-controls button {
+    border: none;
+    background: none;
+    padding: 5px;
 }

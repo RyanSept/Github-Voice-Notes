@@ -3,6 +3,7 @@ import * as React from "react"
 import * as ReactDOM from "react-dom"
 import { v4 as uuidv4 } from "uuid"
 
+import { trackUnknownError } from "./analytics"
 import App from "./App"
 
 const css = require("./index.css")
@@ -14,29 +15,7 @@ function getCommentFileAttachments(): NodeList {
     return commentFileAttachments
 }
 
-/**
- * Insert new voice note button to pull request new comment form.
- */
-function insertNewVoiceNoteButton() {
-    const newCommentFormActions = document.querySelector(
-        "[id=partial-new-comment-form-actions] div.d-flex"
-    )
-    const gvnIcon = chrome.runtime.getURL("static/gvn-icon-128.png")
-    console.log(gvnIcon)
-    const newVoiceNoteButton = `
-    <div class="bg-gray-light">
-        <button class="btn mr-2" type="button" aria-label="Github Voice Notes Icon">
-            <!---->
-            <img src=${gvnIcon}/>
-        </button>
-    </div>
-    `
-    newCommentFormActions.insertAdjacentHTML("afterbegin", newVoiceNoteButton)
-}
-
-function embedGVNOnFileAttachments(
-    commentFileAttachment: FileAttachmentElement
-) {
+function embedGVNOnFileAttachments(commentFileAttachment: Element) {
     const voiceRecordControlsContainerID = `voice-record-controls-container-${uuidv4()}`
     const voiceRecordButtonContainer = `
             <div id="${voiceRecordControlsContainerID}" class="${css.voiceRecordControlsContainer} pt-1">
@@ -55,8 +34,6 @@ function embedGVNOnFileAttachments(
 function setup() {
     // Render in file comments too
     getCommentFileAttachments().forEach(embedGVNOnFileAttachments)
-
-    // insertNewVoiceNoteButton()
 }
 
 setup()
@@ -80,4 +57,14 @@ pageScript.src = chrome.runtime.getURL("page-script.js")
 document.head.appendChild(pageScript)
 pageScript.onload = function () {
     pageScript.remove()
+}
+
+// Catchall error logger
+window.onerror = (message, file, line, col, error) => {
+    trackUnknownError({
+        errMsg: error.message,
+        errorType: error.name,
+        stack: error.stack,
+    })
+    return false
 }
