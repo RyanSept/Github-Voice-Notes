@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from "uuid"
-
 class UninitializedError extends Error {
     constructor(message) {
         super(message)
@@ -84,7 +82,7 @@ const GVNMediaRecorderSingelton = {
         this.mediaRecorder.onstop = () => {
             let audioFile = new File(
                 dataArray,
-                `GithubVoiceNotes-${uuidv4().slice(0, 8)}.mp4`,
+                `GithubVoiceNotes-${Date.now()}.mp4`,
                 {
                     type: "video/mp4",
                 }

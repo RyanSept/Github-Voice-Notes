@@ -5,7 +5,7 @@ const mixpanelLib = require("mixpanel-browser")
 const mixpanel: Mixpanel = mixpanelLib.init(
     process.env.MIXPANEL_TOKEN,
     {
-        debug: true, //process.env.NODE_ENV === "dev",
+        debug: process.env.NODE_ENV === "dev",
         api_host: "https://api-eu.mixpanel.com",
         disable_persistence: true,
         opt_out_persistence_by_default: true,
