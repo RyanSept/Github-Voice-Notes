@@ -16,6 +16,14 @@ function getCommentFileAttachments(): NodeList {
 }
 
 function embedGVNOnFileAttachments(commentFileAttachment: Element) {
+    // Do not embed if one is already embeded
+    if (
+        commentFileAttachment.parentElement.getElementsByClassName(
+            css.voiceRecordControlsContainer
+        ).length
+    ) {
+        return
+    }
     const voiceRecordControlsContainerID = `voice-record-controls-container-${uuidv4()}`
     const voiceRecordButtonContainer = `
             <div id="${voiceRecordControlsContainerID}" class="${css.voiceRecordControlsContainer} pt-1">
