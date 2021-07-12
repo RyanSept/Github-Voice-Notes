@@ -1,50 +1,74 @@
+[data-color-mode="dark"][data-dark-theme*="dark"],
+[data-color-mode="light"][data-light-theme*="dark"] {
+    --gvn-background-color: #111;
+    --voice-record-controls-border: var(--color-scale-gray-6);
+    --voice-record-start-button-filter: invert(100%);
+    --voice-record-start-button-shadow: none;
+}
+
+[data-color-mode="dark"][data-dark-theme*="light"],
+[data-color-mode="light"][data-light-theme*="light"] {
+    --gvn-background-color: #fff;
+    --voice-record-controls-border: var(--color-scale-gray-2);
+    --voice-record-start-button-filter: none;
+    --voice-record-start-button-shadow: #333;
+}
+
+.recording-in-progress-icon {
+    position: absolute;
+    top: -14%;
+    right: 0%;
+}
+
 .voice-record-controls-container {
     position: absolute;
-    left: 98.5%;
+    right: -1%;
     z-index: 1;
-    top: 22%;
+    top: 27%;
     display: flex;
     flex-direction: row;
 }
 
 .voice-record-start-button {
-    width: 40px;
-    height: 40px;
+    width: 3em;
+    height: 3em;
     padding: 0px;
     background: white;
-    background-position: center -20%;
+    background-position: 0.45em -20%;
     background-repeat: no-repeat;
     background-size: 70%;
     background-color: white;
-    border-radius: 40px;
-    border: 1px solid lightgrey;
-    box-shadow: 4px 7px 10px -6px;
+    border-radius: 3em;
+    border: 1px solid var(--color-scale-gray-2);
+    box-shadow: 0px 0px 11px -6px var(--voice-record-start-button-shadow);
+    filter: var(--voice-record-start-button-filter);
 }
 
 .voice-record-controls span {
-    margin-top: 6%;
-    width: 40px;
+    margin-top: 0.9em;
+    margin-bottom: 0.8em;
+    width: 42px;
     text-align: center;
 }
 
 .voice-record-controls::before {
-    border: 1px solid lightgray;
+    border: 1px solid var(--voice-record-controls-border);
     border-left: none;
-    background: white;
+    background: var(--gvn-background-color);
     content: "";
     position: absolute;
     width: 88%;
-    height: 84%;
+    height: 76%;
     top: 12%;
     left: 14%;
     z-index: -1;
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
-    box-shadow: 4px 7px 10px -6px;
 }
 
 .voice-record-controls button {
     border: none;
     background: none;
     padding: 5px;
+    padding-bottom: 0px;
 }

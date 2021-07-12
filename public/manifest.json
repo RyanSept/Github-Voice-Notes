@@ -14,7 +14,8 @@
       "matches": [
         "*://github.com/*/*/pull/*",
         "*://github.com/*/*/pull/*/files",
-        "*://github.com/*/*/pull/*/commits/*"
+        "*://github.com/*/*/pull/*/commits/*",
+        "*://github.com/*/*/commit/*"
       ],
       "js": [
         "main.js"

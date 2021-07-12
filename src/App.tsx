@@ -15,6 +15,7 @@ import {
     ATTACH_FILE_MESSAGE_EVENT_TYPE,
     FILE_ATTACHED_MESSAGE_EVENT_TYPE,
 } from "./constants"
+import { ACTION_TYPES, GlobalStore, TGlobalDispatch } from "./global-state"
 
 const css = require("./index.css")
 
@@ -29,10 +30,10 @@ interface IVoiceRecordControls {
     isAudioInputAllowed: Boolean
 }
 interface IAppState {
-    recordingFSMState: string
-    isGlobalRecording: Boolean
     isAudioInputAllowed: Boolean
+    isGlobalRecordingInProgress: boolean
     recordingEndTime: number
+    recordingFSMState: string
 }
 
 // in milliseconds
@@ -42,12 +43,16 @@ function calculateRecordingLength(leftOverTime: number): number {
 }
 
 class App extends React.Component<IAppProps, IAppState> {
+    globalDispatch: TGlobalDispatch
     recordingFSM: StateMachine
     timeEndedTimeout: NodeJS.Timeout
     countdownComponentRef: React.RefObject<Countdown>
 
     constructor(props) {
         super(props)
+        this.globalDispatch = GlobalStore.subscribe(this, [
+            "isGlobalRecordingInProgress",
+        ])
         this.countdownComponentRef = React.createRef()
         const thatScope = this
         this.recordingFSM = new StateMachine({
@@ -59,9 +64,6 @@ class App extends React.Component<IAppProps, IAppState> {
                 { name: "cancel", from: "recording", to: "canceled" },
                 { name: "reset", from: "*", to: "off" },
             ],
-            data: {
-                // recording start and end, file duration
-            },
             methods: {
                 onStart: function () {
                     GVNMediaRecorderSingelton.start(
@@ -97,7 +99,10 @@ class App extends React.Component<IAppProps, IAppState> {
                         // because we can't transition within transition
                         setImmediate(() => this.reset())
                     }
-                    thatScope.setState({ isGlobalRecording: false })
+                    thatScope.globalDispatch({
+                        type: ACTION_TYPES.SET_IS_RECORDING_IN_PROGRESS,
+                        payload: false,
+                    })
                 },
                 onEnterState: function (lifecycle) {
                     if (lifecycle.transition !== "init") {
@@ -110,10 +115,9 @@ class App extends React.Component<IAppProps, IAppState> {
         this.state = {
             isAudioInputAllowed: true,
             recordingFSMState: this.recordingFSM.state,
-            get isGlobalRecording() {
-                return GVNMediaRecorderSingelton.isRecording
-            },
             recordingEndTime: Date.now(),
+            isGlobalRecordingInProgress:
+                GlobalStore.state.isGlobalRecordingInProgress,
         }
     }
 
@@ -127,7 +131,10 @@ class App extends React.Component<IAppProps, IAppState> {
         this.setState({
             recordingEndTime: Date.now() + MAX_RECORDING_LENGTH,
         })
-        this.setState({ isGlobalRecording: true })
+        this.globalDispatch({
+            type: ACTION_TYPES.SET_IS_RECORDING_IN_PROGRESS,
+            payload: true,
+        })
 
         this.countdownComponentRef.current.getApi().start()
 
@@ -166,7 +173,13 @@ class App extends React.Component<IAppProps, IAppState> {
     }
 
     render() {
-        const gvnIcon = chrome.runtime.getURL("static/gvn-icon-128.png")
+        let gvnIcon = chrome.runtime.getURL("static/gvn-icon-128.png")
+        if (
+            this.state.recordingFSMState !== "recording" &&
+            this.state.isGlobalRecordingInProgress
+        ) {
+            gvnIcon = chrome.runtime.getURL("static/gvn-icon-128-inactive.png")
+        }
         return (
             <>
                 <button
@@ -174,14 +187,19 @@ class App extends React.Component<IAppProps, IAppState> {
                     aria-label="Start recording"
                     type="button"
                     onClick={() => {
-                        if (!this.state.isGlobalRecording) {
+                        if (!this.state.isGlobalRecordingInProgress) {
                             this.recordingFSM.start()
                         }
                     }}
                     style={{
                         backgroundImage: `url(${gvnIcon})`,
                     }}
-                ></button>
+                >
+                    {this.state.recordingFSMState !== "recording" &&
+                        this.state.isGlobalRecordingInProgress && (
+                            <RecordingInProgressMessage />
+                        )}
+                </button>
                 {this.state.recordingFSMState === "recording" && (
                     <VoiceRecordControls
                         handleAccept={() => {
@@ -202,7 +220,7 @@ class App extends React.Component<IAppProps, IAppState> {
 
 function VoiceRecordControls(props: IVoiceRecordControls) {
     return (
-        <div className={`${css.voiceRecordControls} d-flex mt-1`}>
+        <div className={`${css.voiceRecordControls} d-flex`}>
             {props.isAudioInputAllowed ? (
                 <>
                     <button
@@ -263,19 +281,42 @@ function VoiceRecordControls(props: IVoiceRecordControls) {
 const NotAllowedErrorMessage = () => {
     return (
         <span
-            className="tooltipped tooltipped-e"
-            aria-label="Please enable microphone permissions and reload."
+            className="tooltipped tooltipped-w"
+            aria-label="Please allow microphone permissions and reload."
         >
             <svg
-                className="octicon color-icon-warning ml-1"
+                className="octicon color-icon-warning"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 16 16"
-                width="16"
-                height="16"
+                width="20"
+                height="20"
             >
                 <path
                     fillRule="evenodd"
                     d="M8.22 1.754a.25.25 0 00-.44 0L1.698 13.132a.25.25 0 00.22.368h12.164a.25.25 0 00.22-.368L8.22 1.754zm-1.763-.707c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0114.082 15H1.918a1.75 1.75 0 01-1.543-2.575L6.457 1.047zM9 11a1 1 0 11-2 0 1 1 0 012 0zm-.25-5.25a.75.75 0 00-1.5 0v2.5a.75.75 0 001.5 0v-2.5z"
+                ></path>
+            </svg>
+        </span>
+    )
+}
+
+const RecordingInProgressMessage = () => {
+    return (
+        <span
+            className={`tooltipped tooltipped-w ${css.recordingInProgressIcon}`}
+            aria-label="Recording is in progress on a different comment on this page."
+        >
+            <svg
+                className="octicon color-icon-warning recording-in-progress-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+            >
+                <path d="M12 7a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0112 7zm0 10a1 1 0 100-2 1 1 0 000 2z"></path>
+                <path
+                    fillRule="evenodd"
+                    d="M7.328 1.47a.75.75 0 01.53-.22h8.284a.75.75 0 01.53.22l5.858 5.858c.141.14.22.33.22.53v8.284a.75.75 0 01-.22.53l-5.858 5.858a.75.75 0 01-.53.22H7.858a.75.75 0 01-.53-.22L1.47 16.672a.75.75 0 01-.22-.53V7.858a.75.75 0 01.22-.53L7.328 1.47zm.84 1.28L2.75 8.169v7.662l5.419 5.419h7.662l5.419-5.418V8.168L15.832 2.75H8.168z"
                 ></path>
             </svg>
         </span>
