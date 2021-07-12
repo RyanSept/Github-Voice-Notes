@@ -1,7 +1,7 @@
 {
   "name": "Github Voice Notes",
   "description": "Record and add voice note comments to pull requests on Github",
-  "version": "0.2",
+  "version": "0.3",
   "manifest_version": 2,
   "icons": {
     "16": "static/gvn-icon-16.png",
