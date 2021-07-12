@@ -34,11 +34,11 @@
     height: 3em;
     padding: 0px;
     background: white;
-    background-position: 0.45em -20%;
+    background-position: center -23%;
     background-repeat: no-repeat;
     background-size: 70%;
     background-color: white;
-    border-radius: 3em;
+    border-radius: 100%;
     border: 1px solid var(--color-scale-gray-2);
     box-shadow: 0px 0px 11px -6px var(--voice-record-start-button-shadow);
     filter: var(--voice-record-start-button-filter);
