@@ -1,7 +1,7 @@
 # Github-Voice-Notes
 Github Voice Notes allows you to record and attach voice recording comments on Github pull request reviews. It only works on Chromium-based browsers such as Google Chrome and Brave. Feel free to make a pull request and I'll take a look.
 
-# Setup and development
+## Setup and development
 1. Create a .env file on repo root from .env.sample.
 1. Run `npm run start`
 1. Go to `chrome://extensions/` and click `Load unpacked`. Attach the `build/` dir that will be present on the repo root as a result of the `npm run start`. It will say `Extension Loaded` and you should see the extension appear.
